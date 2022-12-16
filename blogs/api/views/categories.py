@@ -6,10 +6,43 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
-from blogs.api.serializers import CategorySerializer
-from blogs.models import Category
+from blogs.api.serializers import CategorySerializer, PostCategorySerializer
+from blogs.models import Category, Post
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 logger = logging.getLogger(__name__)
+
+
+class PostCategoriesViewSet(
+    ModelViewSet
+):
+    serializer_class = PostCategorySerializer
+    lookup_field = "uuid"
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        try:
+            post = Post.objects.get(slug=self.kwargs.get("slug"))
+            return Category.objects.filter(posts__id__exact=post.id)
+        except Post.DoesNotExist:
+            return Category.objects.none()
+
+    def perform_create(self, serializer):
+        try:
+            post = Post.objects.get(uuid=self.kwargs.get("slug"))
+            category = Category.objects.get(uuid=self.kwargs.get("uuid"))
+            post.categories.add(category)
+            post.save()
+        except (Post.DoesNotExist, Category.DoesNotExist):
+            raise Http404
+
+    def perform_destroy(self, instance):
+        post = get_object_or_404(Post, uuid=self.kwargs.get("post_uuid"))
+        try:
+            post.categories.remove(instance)
+        except Category.DoesNotExist:
+            raise Http404
 
 
 class CategoryViewSet(

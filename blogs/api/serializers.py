@@ -59,3 +59,23 @@ class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
         exclude = ("id",)
+
+
+class PostCategorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        read_only=True
+    )
+
+    class Meta:
+        model = Category
+        fields = ('name', 'uuid',)
+
+
+class PostTagSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        read_only=True
+    )
+
+    class Meta:
+        model = Category
+        fields = ('name',)

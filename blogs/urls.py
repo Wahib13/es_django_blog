@@ -1,8 +1,8 @@
 from django.urls import path
 
-from blogs.api.views.categories import CategoryViewSet
+from blogs.api.views.categories import CategoryViewSet, PostCategoriesViewSet
 from blogs.api.views.posts import PostViewSet, PostImageViewSet, ImageViewSet
-from blogs.api.views.tags import TagViewSet
+from blogs.api.views.tags import TagViewSet, PostTagsViewSet
 
 app_name = "blogs"
 
@@ -49,5 +49,27 @@ urlpatterns = [
             {"get": "retrieve", "patch": "partial_update", "delete": "destroy"},
             name="post-image-detail"
         )
+    ),
+
+    path(
+        "posts/<str:slug>/categories/",
+        PostCategoriesViewSet.as_view({"get": "list", }),
+        name="posts_categories-list"
+    ),
+    path(
+        "posts/<str:slug>/categories/<str:uuid>/",
+        PostCategoriesViewSet.as_view({"post": "create", "delete": "destroy", }),
+        name="posts_categories-create-delete"
+    ),
+
+    path(
+        "posts/<str:slug>/tags/",
+        PostTagsViewSet.as_view({"get": "list", }),
+        name="posts_tags-list"
+    ),
+    path(
+        "posts/<str:slug>/tags/<str:name>/",
+        PostTagsViewSet.as_view({"post": "create", "delete": "destroy", }),
+        name="posts_tags-create-delete"
     ),
 ]

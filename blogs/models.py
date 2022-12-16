@@ -1,16 +1,24 @@
 import random
 import string
+import uuid
 
 from django.db import models
-import uuid
-from mptt.models import MPTTModel
-from mptt.fields import TreeForeignKey
 from django.template.defaultfilters import slugify
+from django.utils import timezone
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from blogs.utils import compress
 
-from django.utils import timezone
-from django.db import transaction
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        ordering = ("name",)
 
 
 class Category(MPTTModel):
@@ -53,7 +61,8 @@ class Post(models.Model):
     updated_at = models.DateField(auto_now=True)
     published_at = models.DateField()
 
-    # category = models.ManyToManyField(Category, blank=True)
+    categories = models.ManyToManyField(Category, blank=True, related_name="posts")
+    tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
 
     def publish(self):
         self.status = Post.Status.PUBLISHED
@@ -63,8 +72,8 @@ class Post(models.Model):
     def __str__(self):
         return f"{self.title}"
 
-    # class Meta:
-    #     ordering = ("slug")
+    class Meta:
+        ordering = ("created_at",)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -92,10 +101,3 @@ class PostImage(models.Model):
             self.image = compress(self.image)
 
         super(PostImage, self).save(*args, **kwargs)
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return f"{self.name}"
