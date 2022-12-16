@@ -1,8 +1,10 @@
 from mptt.exceptions import InvalidMove
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
+from django.apps import apps
+from django.conf import settings
 
-from blogs.models import Category, Post, PostImage
+from blogs.models import Category, Post, PostImage, Author
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -38,7 +40,52 @@ class CategorySerializer(serializers.ModelSerializer):
             raise APIException(detail="category may not be a child of itself")
 
 
+class PostCategorySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        read_only=True
+    )
+
+    class Meta:
+        model = Category
+        fields = ('name', 'uuid',)
+
+
+class PostTagSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        read_only=True
+    )
+
+    class Meta:
+        model = Category
+        fields = ('name',)
+
+
+class PostAuthorSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(read_only=True)
+    uuid = serializers.UUIDField()
+
+    class Meta:
+        model = apps.get_model(*getattr(settings, "BLOGS_AUTHOR_MODEL", "blogs.Author").split('.', 1))
+        exclude = ("id",)
+
+
 class PostSerializer(serializers.ModelSerializer):
+    author = PostAuthorSerializer(
+        default=None
+    )
+
+    categories = PostCategorySerializer(
+        default=[],
+        many=True,
+        read_only=True,
+    )
+
+    tags = PostTagSerializer(
+        default=[],
+        many=True,
+        read_only=True,
+    )
+
     class Meta:
         model = Post
         exclude = ("id", "status",)
@@ -59,23 +106,3 @@ class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
         exclude = ("id",)
-
-
-class PostCategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(
-        read_only=True
-    )
-
-    class Meta:
-        model = Category
-        fields = ('name', 'uuid',)
-
-
-class PostTagSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(
-        read_only=True
-    )
-
-    class Meta:
-        model = Category
-        fields = ('name',)

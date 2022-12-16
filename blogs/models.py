@@ -7,8 +7,24 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
+from django.conf import settings
 
 from blogs.utils import compress
+
+
+class Author(models.Model):
+    uuid = models.UUIDField(
+        unique=True,
+        editable=False,
+        default=uuid.uuid4
+    )
+    name = models.CharField(
+        max_length=30,
+        db_index=True
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Tag(models.Model):
@@ -32,7 +48,7 @@ class Category(MPTTModel):
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(blank=True, null=True)
     icon = models.FileField(blank=True, null=True)
-    slug = models.SlugField(blank=True, null=False, max_length=255, db_index=True)
+    slug = models.SlugField(blank=True, null=False, max_length=255, db_index=True, editable=False)
 
     def __str__(self):
         return self.name
@@ -49,7 +65,7 @@ class Post(models.Model):
         DRAFT = "Draft"
         PUBLISHED = "Published"
 
-    slug = models.SlugField(blank=True, null=False, max_length=255, db_index=True)
+    slug = models.SlugField(blank=True, null=False, max_length=255, db_index=True, editable=False)
     status = models.CharField(
         max_length=9, choices=Status.choices, default=Status.DRAFT
     )
@@ -63,6 +79,13 @@ class Post(models.Model):
 
     categories = models.ManyToManyField(Category, blank=True, related_name="posts")
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
+
+    author = models.ForeignKey(
+        getattr(settings, 'BLOGS_AUTHOR_MODEL', 'blogs.Author'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     def publish(self):
         self.status = Post.Status.PUBLISHED
