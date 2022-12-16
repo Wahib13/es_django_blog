@@ -25,7 +25,12 @@ class PostViewSet(
     ModelViewSet
 ):
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.prefetch_related(
+        "categories",
+        "tags",
+    ).select_related(
+        "author"
+    ).all()
     lookup_field = "slug"
     parser_classes = (MultiPartParser, FormParser, JSONParser,)
     filter_backends = (DjangoFilterBackend, SearchFilter,)
@@ -85,7 +90,9 @@ class ImageViewSet(
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        return PostImage.objects.all()
+        return PostImage.objects.select_related(
+            "post"
+        ).all()
 
 
 class PublishPost(

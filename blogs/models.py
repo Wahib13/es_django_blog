@@ -75,7 +75,7 @@ class Post(models.Model):
     body = models.TextField(blank=False, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
-    published_at = models.DateField()
+    published_at = models.DateField(blank=True, null=True, default=None)
 
     categories = models.ManyToManyField(Category, blank=True, related_name="posts")
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")

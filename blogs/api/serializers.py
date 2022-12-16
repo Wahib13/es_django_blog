@@ -86,6 +86,8 @@ class PostSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    published_at = serializers.DateField(read_only=True)
+
     class Meta:
         model = Post
         exclude = ("id", "status",)
