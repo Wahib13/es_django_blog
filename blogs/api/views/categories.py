@@ -6,8 +6,8 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
-from blog_project.blogs.api.serializers import CategorySerializer
-from blog_project.blogs.models import Category
+from blogs.api.serializers import CategorySerializer
+from blogs.models import Category
 
 logger = logging.getLogger(__name__)
 

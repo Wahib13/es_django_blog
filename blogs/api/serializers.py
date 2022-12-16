@@ -2,7 +2,7 @@ from mptt.exceptions import InvalidMove
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from blog_project.blogs.models import Category
+from blogs.models import Category
 
 
 class CategorySerializer(serializers.ModelSerializer):

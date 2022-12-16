@@ -1,6 +1,6 @@
 from django.urls import path
 
-from blog_project.blogs.api.views.categories import CategoryViewSet
+from blogs.api.views.categories import CategoryViewSet
 
 app_name = "blogs"
 
