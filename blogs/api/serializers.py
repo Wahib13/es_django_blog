@@ -2,7 +2,7 @@ from mptt.exceptions import InvalidMove
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from blogs.models import Category
+from blogs.models import Category, Post, PostImage
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -36,3 +36,26 @@ class CategorySerializer(serializers.ModelSerializer):
             return category
         except InvalidMove:
             raise APIException(detail="category may not be a child of itself")
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        exclude = ("id", "status",)
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        exclude = ("id",)
+
+
+class PostImageSerializer(serializers.ModelSerializer):
+    post = serializers.CharField(
+        source="post.slug",
+        read_only=True
+    )
+
+    class Meta:
+        model = PostImage
+        exclude = ("id",)

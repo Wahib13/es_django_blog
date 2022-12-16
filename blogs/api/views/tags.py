@@ -6,22 +6,19 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
-from blogs.api.serializers import CategorySerializer
-from blogs.models import Category
+from blogs.api.serializers import TagSerializer
+from blogs.models import Tag
 
 logger = logging.getLogger(__name__)
 
 
-class CategoryViewSet(
+class TagViewSet(
     ModelViewSet
 ):
-    serializer_class = CategorySerializer
-    queryset = Category.objects.prefetch_related(
-        "parent"
-    ).all()
-    lookup_field = "uuid"
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    lookup_field = "name"
     parser_classes = (MultiPartParser, FormParser, JSONParser,)
     filter_backends = (DjangoFilterBackend, SearchFilter,)
-    filterset_fields = ("parent__name",)
     search_fields = ("name",)
     permission_classes = [IsAuthenticatedOrReadOnly]

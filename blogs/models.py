@@ -7,6 +7,11 @@ from mptt.models import MPTTModel
 from mptt.fields import TreeForeignKey
 from django.template.defaultfilters import slugify
 
+from blogs.utils import compress
+
+from django.utils import timezone
+from django.db import transaction
+
 
 class Category(MPTTModel):
     uuid = models.UUIDField(
@@ -29,3 +34,68 @@ class Category(MPTTModel):
             char = "".join((random.sample(string.ascii_lowercase, 5)))
             self.slug = slugify(self.name + "-" + char)
         return super().save(*args, **kwargs)
+
+
+class Post(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "Draft"
+        PUBLISHED = "Published"
+
+    slug = models.SlugField(blank=True, null=False, max_length=255, db_index=True)
+    status = models.CharField(
+        max_length=9, choices=Status.choices, default=Status.DRAFT
+    )
+    title = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    sub_title = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, )
+    body = models.TextField(blank=False, null=True)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+    published_at = models.DateField()
+
+    # category = models.ManyToManyField(Category, blank=True)
+
+    def publish(self):
+        self.status = Post.Status.PUBLISHED
+        self.published_at = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return f"{self.title}"
+
+    # class Meta:
+    #     ordering = ("slug")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            char = "".join((random.sample(string.ascii_lowercase, 5)))
+            self.slug = slugify(self.title + "-" + char)
+        return super().save(*args, **kwargs)
+
+
+class PostImage(models.Model):
+
+    def __init__(self, *args, **kwargs):
+        super(PostImage, self).__init__(*args, **kwargs)
+        self._image = self.image
+
+    uuid = models.UUIDField(
+        unique=True,
+        editable=False,
+        default=uuid.uuid4
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    image = models.ImageField(blank=True, null=True, )
+
+    def save(self, *args, **kwargs):
+        if self.image and self._image != self.image:
+            self.image = compress(self.image)
+
+        super(PostImage, self).save(*args, **kwargs)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
