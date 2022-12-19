@@ -124,3 +124,32 @@ class PostImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImage
         exclude = ("id",)
+
+
+class ParentCategoryReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "uuid",
+            "name",
+            "description",
+            "image",
+            "icon",
+        )
+
+
+class CategoryReadSerializer(serializers.ModelSerializer):
+    parent = ParentCategoryReadSerializer(
+        read_only=True,
+    )
+
+    class Meta:
+        model = Category
+        fields = (
+            "uuid",
+            "name",
+            "description",
+            "parent",
+            "image",
+            "icon",
+        )

@@ -6,7 +6,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
-from blogs.api.serializers import CategorySerializer, PostCategorySerializer
+from blogs.api.serializers import CategorySerializer, PostCategorySerializer, CategoryReadSerializer
 from blogs.models import Category, Post
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -48,7 +48,12 @@ class PostCategoriesViewSet(
 class CategoryViewSet(
     ModelViewSet
 ):
-    serializer_class = CategorySerializer
+
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return CategoryReadSerializer
+        return CategorySerializer
+
     queryset = Category.objects.prefetch_related(
         "parent"
     ).all()
