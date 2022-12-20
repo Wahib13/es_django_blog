@@ -69,7 +69,7 @@ class Post(models.Model):
     status = models.CharField(
         max_length=9, choices=Status.choices, default=Status.DRAFT
     )
-    title = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    title = models.CharField(max_length=255, db_index=True)
     sub_title = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(blank=True, null=True)
     banner = models.ImageField(blank=True, null=True)
