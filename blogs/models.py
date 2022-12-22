@@ -76,22 +76,17 @@ class Post(models.Model):
     body = models.TextField(blank=False, null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
-    published_at = models.DateField(blank=True, null=True, default=None)
+    published_at = models.DateTimeField(blank=True, null=True, default=None)
 
     categories = models.ManyToManyField(Category, blank=True, related_name="posts")
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
 
     author = models.ForeignKey(
-        getattr(settings, 'BLOGS_AUTHOR_MODEL', 'blogs.Author'),
+        Author,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-
-    def publish(self):
-        self.status = Post.Status.PUBLISHED
-        self.published_at = timezone.now()
-        self.save()
 
     def __str__(self):
         return f"{self.title}"

@@ -81,7 +81,7 @@ class PostAuthorSerializer(serializers.ModelSerializer):
     uuid = serializers.UUIDField()
 
     class Meta:
-        model = apps.get_model(*getattr(settings, "BLOGS_AUTHOR_MODEL", "blogs.Author").split('.', 1))
+        model = Author
         exclude = ("id",)
 
 
@@ -102,11 +102,9 @@ class PostSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    published_at = serializers.DateField(read_only=True)
-
     class Meta:
         model = Post
-        exclude = ("id", "status",)
+        exclude = ("id",)
 
 
 class TagSerializer(serializers.ModelSerializer):
