@@ -1,7 +1,7 @@
 from django.urls import path
 
 from blogs.api.views.categories import CategoryViewSet, PostCategoriesViewSet
-from blogs.api.views.posts import PostViewSet, PostImageViewSet, ImageViewSet, PublishPost
+from blogs.api.views.posts import PostViewSet, PostImageViewSet, ImageViewSet
 from blogs.api.views.tags import TagViewSet, PostTagsViewSet
 
 app_name = "blogs"
@@ -72,10 +72,4 @@ urlpatterns = [
         PostTagsViewSet.as_view({"post": "create", "delete": "destroy", }),
         name="posts_tags-create-delete"
     ),
-
-    path(
-        "posts/<str:slug>/publish/",
-        PublishPost.as_view(),
-        name="posts_publish"
-    )
 ]

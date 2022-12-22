@@ -1,8 +1,6 @@
 from mptt.exceptions import InvalidMove
 from rest_framework import serializers
 from rest_framework import status
-from django.apps import apps
-from django.conf import settings
 from rest_framework.response import Response
 
 from blogs.models import Category, Post, PostImage, Author, Tag
@@ -141,10 +139,13 @@ class CategoryReadSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    total_posts = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Category
         fields = (
             "uuid",
+            "total_posts",
             "name",
             "description",
             "parent",

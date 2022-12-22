@@ -10,6 +10,7 @@ from blogs.api.serializers import CategorySerializer, PostCategorySerializer, Ca
 from blogs.models import Category, Post
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +55,12 @@ class CategoryViewSet(
             return CategoryReadSerializer
         return CategorySerializer
 
-    queryset = Category.objects.prefetch_related(
+    queryset = Category.objects.select_related(
         "parent"
+    ).prefetch_related(
+        "posts"
+    ).annotate(
+        total_posts=Count("posts")
     ).all()
     lookup_field = "uuid"
     parser_classes = (MultiPartParser, FormParser, JSONParser,)

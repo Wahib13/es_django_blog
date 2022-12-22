@@ -34,7 +34,7 @@ class PostViewSet(
     lookup_field = "slug"
     parser_classes = (MultiPartParser, FormParser, JSONParser,)
     filter_backends = (DjangoFilterBackend, SearchFilter,)
-    # filterset_fields = ("category",)
+    filterset_fields = ("featured",)
     search_fields = ("title",)
 
     # permission_classes = [IsAuthenticatedOrReadOnly]
@@ -93,24 +93,3 @@ class ImageViewSet(
         return PostImage.objects.select_related(
             "post"
         ).all()
-
-
-class PublishPost(
-    CreateAPIView
-):
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        try:
-            post = Post.objects.get(slug=self.kwargs.get("slug"))
-            post.publish()
-            return Response(
-                status=status.HTTP_200_OK,
-            )
-        except Post.DoesNotExist:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND,
-                data={
-                    "detail": "post does not exist"
-                }
-            )

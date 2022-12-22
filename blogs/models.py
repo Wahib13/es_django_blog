@@ -74,12 +74,14 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True)
     banner = models.ImageField(blank=True, null=True)
     body = models.TextField(blank=False, null=True)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(blank=True, null=True, default=None)
 
     categories = models.ManyToManyField(Category, blank=True, related_name="posts")
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
+
+    featured = models.BooleanField(default=False, db_index=True)
 
     author = models.ForeignKey(
         Author,
